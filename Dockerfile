@@ -1,9 +1,14 @@
 FROM python:3.12-slim
 
-# Install ttyd + bash (for stall shells)
+# Install ttyd (binary from GitHub releases) + shell tools
+ARG TTYD_VERSION=1.7.7
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ttyd bash tmux git \
+    bash tmux git curl ca-certificates \
+    && curl -fsSL -o /usr/local/bin/ttyd \
+       "https://github.com/tsl0922/ttyd/releases/download/${TTYD_VERSION}/ttyd.x86_64" \
+    && chmod +x /usr/local/bin/ttyd \
+    && apt-get purge -y curl && apt-get autoremove -y \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
