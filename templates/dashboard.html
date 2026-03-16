@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>clidestable</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #1a1a2e; color: #e0e0e0; font-family: 'SF Mono', 'Fira Code', monospace; padding: 24px; }
+        h1 { color: #36f9f6; margin-bottom: 8px; font-size: 1.4em; }
+        .subtitle { color: #888; font-size: 0.85em; margin-bottom: 24px; }
+        .stalls { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .stall-card {
+            background: #16213e; border: 1px solid #333; border-radius: 8px; padding: 16px;
+            transition: border-color 0.2s;
+        }
+        .stall-card:hover { border-color: #36f9f6; }
+        .stall-name { color: #72f1b8; font-size: 1.1em; font-weight: 600; margin-bottom: 8px; }
+        .stall-status { font-size: 0.8em; margin-bottom: 12px; }
+        .alive { color: #72f1b8; }
+        .dead { color: #f92aad; }
+        .stall-actions { display: flex; gap: 8px; }
+        .btn {
+            padding: 6px 14px; border: 1px solid #444; border-radius: 4px; cursor: pointer;
+            font-family: inherit; font-size: 0.8em; background: #1a1a2e; color: #e0e0e0;
+            text-decoration: none; display: inline-block;
+        }
+        .btn:hover { border-color: #36f9f6; color: #36f9f6; }
+        .btn-danger:hover { border-color: #f92aad; color: #f92aad; }
+        .btn-primary { background: #36f9f6; color: #111; border-color: #36f9f6; }
+        .btn-primary:hover { background: #72f1b8; }
+        .create-form { margin-bottom: 24px; display: flex; gap: 8px; align-items: center; }
+        .create-form input {
+            padding: 6px 12px; background: #16213e; border: 1px solid #444; border-radius: 4px;
+            color: #e0e0e0; font-family: inherit; font-size: 0.85em;
+        }
+        .empty { color: #666; padding: 40px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>🐴 clidestable</h1>
+    <p class="subtitle">VPS session server — manage stalls for your dales</p>
+
+    <div class="create-form">
+        <input type="text" id="new-name" placeholder="stall name (e.g. edge)" />
+        <button class="btn btn-primary" onclick="createStall()">Create Stall</button>
+    </div>
+
+    <div class="stalls" id="stalls">
+        {% if not stalls %}
+        <div class="empty">No stalls yet. Create one above.</div>
+        {% endif %}
+        {% for s in stalls %}
+        <div class="stall-card" id="card-{{ s.name }}">
+            <div class="stall-name">{{ s.name }}</div>
+            <div class="stall-status">
+                Port {{ s.port }} &middot;
+                {% if s.alive %}<span class="alive">running</span>{% else %}<span class="dead">stopped</span>{% endif %}
+            </div>
+            <div class="stall-actions">
+                {% if s.alive %}
+                <a class="btn" href="/stall/{{ s.name }}/" target="_blank">Terminal</a>
+                {% endif %}
+                <a class="btn" href="/log/{{ s.name }}">Log</a>
+                <button class="btn btn-danger" onclick="destroyStall('{{ s.name }}')">Destroy</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+    async function createStall() {
+        const name = document.getElementById('new-name').value.trim();
+        if (!name) return;
+        const resp = await fetch('/api/stalls', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name}),
+        });
+        if (resp.ok) location.reload();
+        else alert((await resp.json()).error);
+    }
+    async function destroyStall(name) {
+        if (!confirm('Destroy stall "' + name + '"?')) return;
+        await fetch('/api/stalls/' + name, {method: 'DELETE'});
+        location.reload();
+    }
+    document.getElementById('new-name').addEventListener('keydown', e => {
+        if (e.key === 'Enter') createStall();
+    });
+    </script>
+</body>
+</html>

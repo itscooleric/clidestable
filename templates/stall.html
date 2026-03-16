@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ stall.name }} — clidestable</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #1a1a2e; color: #e0e0e0; font-family: 'SF Mono', monospace; }
+        .header {
+            padding: 8px 16px; background: #16213e; border-bottom: 1px solid #333;
+            display: flex; align-items: center; gap: 12px; font-size: 0.85em;
+        }
+        .header a { color: #36f9f6; text-decoration: none; }
+        .header a:hover { text-decoration: underline; }
+        .name { color: #72f1b8; font-weight: 600; }
+        iframe { width: 100%; height: calc(100vh - 40px); border: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="/">&larr; stalls</a>
+        <span class="name">{{ stall.name }}</span>
+        <span style="color:#888;">port {{ stall.port }}</span>
+        <a href="/log/{{ stall.name }}">log</a>
+    </div>
+    <iframe src="http://{{ request.host.split(':')[0] }}:{{ stall.port }}/stall/{{ stall.name }}/"></iframe>
+</body>
+</html>
