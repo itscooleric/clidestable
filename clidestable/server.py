@@ -15,7 +15,17 @@ logger = logging.getLogger("clidestable")
 
 def create_app(log_dir: str = "/opt/stacks", base_port: int = 7701) -> Flask:
     """Create the Flask application."""
-    template_dir = Path(__file__).parent.parent / "templates"
+    # Templates may be alongside the package (dev) or one level up (Docker)
+    for candidate in [
+        Path(__file__).parent.parent / "templates",
+        Path(__file__).parent / "templates",
+        Path("/app/templates"),
+    ]:
+        if candidate.is_dir():
+            template_dir = candidate
+            break
+    else:
+        template_dir = Path(__file__).parent.parent / "templates"
     app = Flask("clidestable", template_folder=str(template_dir))
 
     manager = StallManager(log_dir=log_dir, base_port=base_port)
