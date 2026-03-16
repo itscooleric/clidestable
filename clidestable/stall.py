@@ -88,7 +88,7 @@ class StallManager:
         port = self._allocate_port()
         log_path = self._log_dir / f".sdale-{name}.log"
 
-        # Start ttyd with a bash shell
+        # Start ttyd with a bash shell in the data directory
         try:
             proc = subprocess.Popen(
                 [
@@ -96,7 +96,8 @@ class StallManager:
                     "--port", str(port),
                     "--writable",
                     "--base-path", f"/stall/{name}/",
-                    "bash",
+                    "--cwd", str(self._log_dir),
+                    "bash", "--login",
                 ],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,

@@ -1,0 +1,14 @@
+services:
+  clidestable:
+    build: .
+    container_name: clidestable
+    restart: unless-stopped
+    ports:
+      - "${STABLE_BIND:-0.0.0.0}:${STABLE_PORT:-7690}:7690"
+      # ttyd stall ports (20 stalls max)
+      - "${STABLE_BIND:-0.0.0.0}:7701-7720:7701-7720"
+    volumes:
+      # Shared with clidesdale agent logs
+      - ${STABLE_DATA_DIR:-/opt/stacks}:/data
+    environment:
+      - STABLE_PORT=${STABLE_PORT:-7690}
