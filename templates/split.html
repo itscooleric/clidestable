@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>clidestable — split view</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #1a1a2e; color: #e0e0e0; font-family: 'SF Mono', monospace; height: 100vh; display: flex; flex-direction: column; }
+        .toolbar {
+            padding: 6px 16px; background: #16213e; border-bottom: 1px solid #333;
+            display: flex; align-items: center; gap: 12px; font-size: 0.82em; flex-shrink: 0;
+        }
+        .toolbar a { color: #36f9f6; text-decoration: none; }
+        .toolbar a:hover { text-decoration: underline; }
+        .toolbar .title { color: #72f1b8; font-weight: 600; }
+        .toolbar .btn {
+            padding: 3px 10px; border: 1px solid #444; border-radius: 4px; cursor: pointer;
+            font-family: inherit; font-size: 0.85em; background: #1a1a2e; color: #e0e0e0;
+        }
+        .toolbar .btn:hover { border-color: #36f9f6; color: #36f9f6; }
+        .toolbar .btn.active { background: #36f9f6; color: #111; border-color: #36f9f6; }
+        .panels { flex: 1; display: flex; overflow: hidden; }
+        .panel { flex: 1; display: flex; flex-direction: column; border-right: 1px solid #333; min-width: 0; }
+        .panel:last-child { border-right: none; }
+        .panel-header {
+            padding: 4px 12px; background: #0f1629; border-bottom: 1px solid #333;
+            font-size: 0.78em; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+        }
+        .panel-header .name { color: #72f1b8; font-weight: 600; }
+        .panel-header .tab { padding: 2px 8px; cursor: pointer; border-radius: 3px; }
+        .panel-header .tab:hover { background: rgba(255,255,255,0.05); }
+        .panel-header .tab.active { background: rgba(54,249,246,0.15); color: #36f9f6; }
+        .panel-body { flex: 1; position: relative; }
+        .panel-body iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
+        .panel-body pre {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            padding: 8px 12px; font-size: 0.78em; line-height: 1.5; overflow: auto;
+            background: #0a0a1a; white-space: pre-wrap; word-break: break-word;
+        }
+        .empty { padding: 40px; text-align: center; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <a href="/">&larr; dashboard</a>
+        <span class="title">🐴 split view</span>
+        <span style="color:#888;">{{ stalls|length }} stall{{ 's' if stalls|length != 1 }}</span>
+    </div>
+
+    {% if not stalls %}
+    <div class="empty">No running stalls. Create some from the <a href="/">dashboard</a>.</div>
+    {% else %}
+    <div class="panels" id="panels">
+        {% for s in stalls %}
+        <div class="panel" id="panel-{{ s.name }}">
+            <div class="panel-header">
+                <span class="name">{{ s.name }}</span>
+                <span class="tab active" onclick="showTab('{{ s.name }}','terminal')">Terminal</span>
+                <span class="tab" onclick="showTab('{{ s.name }}','log')">Log</span>
+            </div>
+            <div class="panel-body">
+                <iframe id="term-{{ s.name }}" src="http://{{ request.host.split(':')[0] }}:{{ s.port }}/stall/{{ s.name }}/"></iframe>
+                <pre id="log-{{ s.name }}" style="display:none;">Loading...</pre>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <script>
+    function showTab(name, tab) {
+        const term = document.getElementById('term-' + name);
+        const log = document.getElementById('log-' + name);
+        const panel = document.getElementById('panel-' + name);
+        const tabs = panel.querySelectorAll('.tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        if (tab === 'terminal') {
+            term.style.display = '';
+            log.style.display = 'none';
+            tabs[0].classList.add('active');
+        } else {
+            term.style.display = 'none';
+            log.style.display = '';
+            tabs[1].classList.add('active');
+            refreshLog(name);
+        }
+    }
+    async function refreshLog(name) {
+        try {
+            const resp = await fetch('/api/stalls/' + name + '/log?lines=500');
+            const data = await resp.json();
+            const el = document.getElementById('log-' + name);
+            el.textContent = data.log || '(empty)';
+            el.scrollTop = el.scrollHeight;
+        } catch(e) {}
+    }
+    // Auto-refresh logs for visible log panels
+    setInterval(() => {
+        document.querySelectorAll('pre[id^="log-"]').forEach(el => {
+            if (el.style.display !== 'none') {
+                const name = el.id.replace('log-', '');
+                refreshLog(name);
+            }
+        });
+    }, 3000);
+    </script>
+</body>
+</html>

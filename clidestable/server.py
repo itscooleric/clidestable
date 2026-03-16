@@ -84,6 +84,13 @@ def create_app(log_dir: str = "/opt/stacks", base_port: int = 7701) -> Flask:
         # Render a page that iframes the ttyd port
         return render_template("stall.html", stall=stall.to_dict())
 
+    # -- Split view (all stalls side by side) --
+
+    @app.route("/view")
+    def split_view():
+        stalls = [s.to_dict() for s in manager.stalls.values() if s.alive]
+        return render_template("split.html", stalls=stalls)
+
     # -- Log viewer --
 
     @app.route("/log/<name>")

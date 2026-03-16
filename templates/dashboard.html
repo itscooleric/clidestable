@@ -43,6 +43,7 @@
     <div class="create-form">
         <input type="text" id="new-name" placeholder="stall name (e.g. edge)" />
         <button class="btn btn-primary" onclick="createStall()">Create Stall</button>
+        {% if stalls %}<a class="btn" href="/view">Split View</a>{% endif %}
     </div>
 
     <div class="stalls" id="stalls">
