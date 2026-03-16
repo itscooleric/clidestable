@@ -88,16 +88,21 @@ class StallManager:
         port = self._allocate_port()
         log_path = self._log_dir / f".sdale-{name}.log"
 
-        # Start ttyd with a bash shell in the data directory
+        # Ensure log file exists
+        log_path.touch(exist_ok=True)
+
+        # Start ttyd tailing the activity log — shows agent commands in real time
         try:
             proc = subprocess.Popen(
                 [
                     "ttyd",
                     "--port", str(port),
-                    "--writable",
+                    "--readonly",
                     "--base-path", f"/stall/{name}/",
-                    "--cwd", str(self._log_dir),
-                    "bash", "--login",
+                    "bash", "-c",
+                    f"echo '🐴 stall: {name} — watching agent activity'; "
+                    f"echo '   log: {log_path}'; echo ''; "
+                    f"tail -f {log_path}",
                 ],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
