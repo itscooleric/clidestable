@@ -36,10 +36,27 @@ Then open `http://your-vps:7690` to see the dashboard.
 
 ## What it does
 
-- Manages named **stalls** (shell sessions on the VPS)
-- Each stall gets a web terminal via ttyd (subpath routed)
-- Activity logs from clidesdale agents are visible in the UI
+- Manages named **stalls** (observable agent sessions on the VPS)
+- Each stall gets a web terminal via [ttyd](https://github.com/tsl0922/ttyd) that streams the activity log in real time
+- Activity logs from [clidesdale](https://github.com/itscooleric/clidesdale) agents are visible in the dashboard
+- Split view for watching multiple agents side-by-side
 - REST API for stall management
+
+## How it works
+
+1. **clidesdale** agents run commands on the VPS via `sdale exec` / `sdale run`
+2. Every command + output is appended to `/opt/stacks/.sdale-<name>.log`
+3. **clidestable** creates stalls — each stall spawns a ttyd instance that `tail -f`'s the corresponding log file
+4. You see agent activity streaming in your browser in real time
+
+```
+  clidesdale (client)              clidestable (server)
+  ─────────────────              ───────────────────────
+  sdale exec edge "cmd"   ──>   .sdale-edge.log   ──>  ttyd (tail -f)  ──>  browser
+  sdale exec edge2 "cmd"  ──>   .sdale-edge2.log  ──>  ttyd (tail -f)  ──>  browser
+```
+
+No tmux nesting, no SSH tunnels — just log files and ttyd.
 
 ## Concepts
 
