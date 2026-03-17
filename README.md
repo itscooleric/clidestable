@@ -57,8 +57,41 @@ GET    /api/stalls/{name}/log   # get activity log
 └──────────────────────────────────────────┘
 ```
 
+## Docker
+
+```bash
+docker compose up -d --build
+```
+
+Configure in `.env`:
+```bash
+STABLE_BIND=100.x.x.x   # Tailscale IP (default: 0.0.0.0)
+STABLE_PORT=7690         # Dashboard port
+STABLE_DATA_DIR=/opt/stacks  # Shared with clidesdale agent logs
+```
+
+## Web UI
+
+| Page | What |
+|------|------|
+| `/` | Dashboard — create/destroy stalls, quick links |
+| `/view` | Split view — side-by-side terminals for all stalls |
+| `/stall/<name>/` | Single stall terminal (live agent activity stream) |
+| `/log/<name>` | Activity log viewer (auto-refreshes every 3s) |
+
 ## Requirements
 
 - Python 3.10+
-- `ttyd` installed on the VPS
-- That's it
+- `ttyd` (included in Docker image)
+
+## Ecosystem
+
+| Project | What |
+|---------|------|
+| [clidesdale](https://github.com/itscooleric/clidesdale) | CLI client — gives agents VPS access |
+| **clidestable** | This server — dashboard, stall management, split terminal view |
+| [clide](https://github.com/itscooleric/clide) | CLI Development Environment — sandboxed terminal for AI agents |
+
+## License
+
+MIT
