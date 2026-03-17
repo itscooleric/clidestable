@@ -1,6 +1,26 @@
-# clidestable 🐴
+# clidestable
 
-> The stable where your dales live — VPS-side session server for [clidesdale](https://github.com/itscooleric/clidesdale).
+```text
+   ██████╗██╗     ██╗██████╗ ███████╗
+  ██╔════╝██║     ██║██╔══██╗██╔════╝
+  ██║     ██║     ██║██║  ██║█████╗        ───
+  ██║     ██║     ██║██║  ██║██╔══╝          \
+  ╚██████╗███████╗██║██████╔╝███████╗         \    ╱▔▔▔╲
+   ╚═════╝╚══════╝╚═╝╚═════╝ ╚══════╝         ╲__╱ ● ● ╲
+  ███████╗████████╗ █████╗ ██████╗ ██╗     ███████╗│  ▽  │
+  ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗██║     ██╔════╝ ╲───╱
+  ███████╗   ██║   ███████║██████╔╝██║     █████╗   ╱   ╲
+  ╚════██║   ██║   ██╔══██║██╔══██╗██║     ██╔══╝  ╱ ┃ ┃ ╲
+  ███████║   ██║   ██║  ██║██████╔╝███████╗███████╗╱  ┃ ┃  ╲
+  ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚══════╝╚══════╝
+
+  the stable where your dales live               v0.1
+  ────────────────────────────────────────────────────
+  dashboard · stalls · split view · activity logs
+  ────────────────────────────────────────────────────
+```
+
+> VPS-side session server for [clidesdale](https://github.com/itscooleric/clidesdale).
 
 A lightweight server that manages **stalls** (observable shell sessions) on a VPS. Each stall gets a web terminal (ttyd) and an activity log. One port, multiple sessions, zero complexity.
 
