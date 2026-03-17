@@ -55,12 +55,12 @@
         <div class="panel" id="panel-{{ s.name }}">
             <div class="panel-header">
                 <span class="name">{{ s.name }}</span>
-                <span class="tab active" onclick="showTab('{{ s.name }}','terminal')">Terminal</span>
-                <span class="tab" onclick="showTab('{{ s.name }}','log')">Log</span>
+                <span class="tab" onclick="showTab('{{ s.name }}','terminal')">Terminal</span>
+                <span class="tab active" onclick="showTab('{{ s.name }}','log')">Log</span>
             </div>
             <div class="panel-body">
-                <iframe id="term-{{ s.name }}" src="http://{{ request.host.split(':')[0] }}:{{ s.port }}/stall/{{ s.name }}/"></iframe>
-                <pre id="log-{{ s.name }}" style="display:none;">Loading...</pre>
+                <iframe id="term-{{ s.name }}" style="display:none;" data-src="http://{{ request.host.split(':')[0] }}:{{ s.port }}/stall/{{ s.name }}/"></iframe>
+                <pre id="log-{{ s.name }}">Loading...</pre>
             </div>
         </div>
         {% endfor %}
@@ -75,6 +75,8 @@
         const tabs = panel.querySelectorAll('.tab');
         tabs.forEach(t => t.classList.remove('active'));
         if (tab === 'terminal') {
+            // Lazy-load iframe on first click (avoids WebSocket issues on mobile)
+            if (!term.src && term.dataset.src) term.src = term.dataset.src;
             term.style.display = '';
             log.style.display = 'none';
             tabs[0].classList.add('active');
@@ -94,7 +96,7 @@
             el.scrollTop = el.scrollHeight;
         } catch(e) {}
     }
-    // Auto-refresh logs for visible log panels
+    // Auto-refresh visible log panels every 2s
     setInterval(() => {
         document.querySelectorAll('pre[id^="log-"]').forEach(el => {
             if (el.style.display !== 'none') {
@@ -102,7 +104,12 @@
                 refreshLog(name);
             }
         });
-    }, 3000);
+    }, 2000);
+    // Initial load for all visible logs
+    document.querySelectorAll('pre[id^="log-"]').forEach(el => {
+        const name = el.id.replace('log-', '');
+        refreshLog(name);
+    });
     </script>
 </body>
 </html>
