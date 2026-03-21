@@ -125,9 +125,9 @@ STABLE_DATA_DIR=/opt/stacks  # Shared with clidesdale agent logs
 
 | Project | What |
 |---------|------|
-| [clidesdale](https://github.com/itscooleric/clidesdale) | CLI client — gives agents VPS access |
-| **clidestable** | This server — dashboard, stall management, split terminal view |
 | [clide](https://github.com/itscooleric/clide) | CLI Development Environment — sandboxed terminal for AI agents |
+| [clidesdale](https://github.com/itscooleric/clidesdale) | CLI client — SSH access to remote VPSes for agents |
+| **clidestable** | This server — dashboard, stall management, split terminal view |
 
 ## License
 
