@@ -22,6 +22,7 @@ class Stall:
 
     name: str
     port: int
+    slot: int = 0  # 1-based slot number for path routing
     pid: Optional[int] = None
     log_path: Optional[Path] = None
 
@@ -36,10 +37,17 @@ class Stall:
         except (OSError, ProcessLookupError):
             return False
 
+    @property
+    def base_path(self) -> str:
+        """URL base path for this stall (e.g. /stall/1/)."""
+        return f"/stall/{self.slot}/"
+
     def to_dict(self) -> dict:
         return {
             "name": self.name,
             "port": self.port,
+            "slot": self.slot,
+            "base_path": self.base_path,
             "pid": self.pid,
             "alive": self.alive,
             "log_path": str(self.log_path) if self.log_path else None,
@@ -86,19 +94,22 @@ class StallManager:
             del self._stalls[name]
 
         port = self._allocate_port()
+        slot = port - self._base_port + 1  # port 7701 → slot 1
         log_path = self._log_dir / f".sdale-{name}.log"
+        base_path = f"/stall/{slot}/"
 
         # Ensure log file exists
         log_path.touch(exist_ok=True)
 
         # Start ttyd tailing the activity log — shows agent commands in real time
+        # Uses slot-based base path so Caddy can route via single port
         try:
             proc = subprocess.Popen(
                 [
                     "ttyd",
                     "--port", str(port),
                     "--readonly",
-                    "--base-path", f"/stall/{name}/",
+                    "--base-path", base_path,
                     "bash", "-c",
                     f"echo '🐴 stall: {name} — watching agent activity'; "
                     f"echo '   log: {log_path}'; echo ''; "
@@ -109,13 +120,13 @@ class StallManager:
                 start_new_session=True,
             )
             pid = proc.pid
-            logger.info("Started stall '%s' on port %d (pid %d)", name, port, pid)
+            logger.info("Started stall '%s' on port %d (slot %d, pid %d)", name, port, slot, pid)
         except FileNotFoundError:
             raise RuntimeError(
                 "ttyd not found. Install it: apt install ttyd (or see https://github.com/tsl0922/ttyd)"
             )
 
-        stall = Stall(name=name, port=port, pid=pid, log_path=log_path)
+        stall = Stall(name=name, port=port, slot=slot, pid=pid, log_path=log_path)
         self._stalls[name] = stall
         return stall
 
