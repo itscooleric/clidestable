@@ -1,78 +1,72 @@
 # clidestable — single port reverse proxy
 # Caddy on :7690 routes dashboard/API to Flask and stall terminals to ttyd.
-# Each stall's ttyd listens on 770N with --base-path /stall/{name}/.
-# Caddy matches /stall/* and proxies to the Flask backend, which redirects
-# to the ttyd iframe. The iframe connects directly via WebSocket on the
-# internal network — but from the outside, only port 7690 is exposed.
 
 {
 	auto_https off
-	admin 127.0.0.1:2019
+	admin off
 }
 
 :7690 {
-	# ttyd stall WebSocket + HTTP — ports 7701-7720
-	# These handle_path blocks strip nothing — ttyd expects the full path.
-	# Caddy proxies the WebSocket upgrade transparently.
-	@stall1 path /stall/1/* /stall/1
-	handle @stall1 { reverse_proxy localhost:7701 }
-
-	@stall2 path /stall/2/* /stall/2
-	handle @stall2 { reverse_proxy localhost:7702 }
-
-	@stall3 path /stall/3/* /stall/3
-	handle @stall3 { reverse_proxy localhost:7703 }
-
-	@stall4 path /stall/4/* /stall/4
-	handle @stall4 { reverse_proxy localhost:7704 }
-
-	@stall5 path /stall/5/* /stall/5
-	handle @stall5 { reverse_proxy localhost:7705 }
-
-	@stall6 path /stall/6/* /stall/6
-	handle @stall6 { reverse_proxy localhost:7706 }
-
-	@stall7 path /stall/7/* /stall/7
-	handle @stall7 { reverse_proxy localhost:7707 }
-
-	@stall8 path /stall/8/* /stall/8
-	handle @stall8 { reverse_proxy localhost:7708 }
-
-	@stall9 path /stall/9/* /stall/9
-	handle @stall9 { reverse_proxy localhost:7709 }
-
-	@stall10 path /stall/10/* /stall/10
-	handle @stall10 { reverse_proxy localhost:7710 }
-
-	@stall11 path /stall/11/* /stall/11
-	handle @stall11 { reverse_proxy localhost:7711 }
-
-	@stall12 path /stall/12/* /stall/12
-	handle @stall12 { reverse_proxy localhost:7712 }
-
-	@stall13 path /stall/13/* /stall/13
-	handle @stall13 { reverse_proxy localhost:7713 }
-
-	@stall14 path /stall/14/* /stall/14
-	handle @stall14 { reverse_proxy localhost:7714 }
-
-	@stall15 path /stall/15/* /stall/15
-	handle @stall15 { reverse_proxy localhost:7715 }
-
-	@stall16 path /stall/16/* /stall/16
-	handle @stall16 { reverse_proxy localhost:7716 }
-
-	@stall17 path /stall/17/* /stall/17
-	handle @stall17 { reverse_proxy localhost:7717 }
-
-	@stall18 path /stall/18/* /stall/18
-	handle @stall18 { reverse_proxy localhost:7718 }
-
-	@stall19 path /stall/19/* /stall/19
-	handle @stall19 { reverse_proxy localhost:7719 }
-
-	@stall20 path /stall/20/* /stall/20
-	handle @stall20 { reverse_proxy localhost:7720 }
+	handle /stall/1/* {
+		reverse_proxy localhost:7701
+	}
+	handle /stall/2/* {
+		reverse_proxy localhost:7702
+	}
+	handle /stall/3/* {
+		reverse_proxy localhost:7703
+	}
+	handle /stall/4/* {
+		reverse_proxy localhost:7704
+	}
+	handle /stall/5/* {
+		reverse_proxy localhost:7705
+	}
+	handle /stall/6/* {
+		reverse_proxy localhost:7706
+	}
+	handle /stall/7/* {
+		reverse_proxy localhost:7707
+	}
+	handle /stall/8/* {
+		reverse_proxy localhost:7708
+	}
+	handle /stall/9/* {
+		reverse_proxy localhost:7709
+	}
+	handle /stall/10/* {
+		reverse_proxy localhost:7710
+	}
+	handle /stall/11/* {
+		reverse_proxy localhost:7711
+	}
+	handle /stall/12/* {
+		reverse_proxy localhost:7712
+	}
+	handle /stall/13/* {
+		reverse_proxy localhost:7713
+	}
+	handle /stall/14/* {
+		reverse_proxy localhost:7714
+	}
+	handle /stall/15/* {
+		reverse_proxy localhost:7715
+	}
+	handle /stall/16/* {
+		reverse_proxy localhost:7716
+	}
+	handle /stall/17/* {
+		reverse_proxy localhost:7717
+	}
+	handle /stall/18/* {
+		reverse_proxy localhost:7718
+	}
+	handle /stall/19/* {
+		reverse_proxy localhost:7719
+	}
+	handle /stall/20/* {
+		reverse_proxy localhost:7720
+	}
 
 	# Everything else — Flask dashboard + API
 	handle {
