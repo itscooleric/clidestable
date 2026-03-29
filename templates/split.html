@@ -59,7 +59,7 @@
                 <span class="tab" onclick="showTab('{{ s.name }}','log')">Log</span>
             </div>
             <div class="panel-body">
-                <iframe id="term-{{ s.name }}" src="http://{{ request.host.split(':')[0] }}:{{ s.port }}/stall/{{ s.name }}/"></iframe>
+                <iframe id="term-{{ s.name }}" src="/stall/{{ s.slot }}/"></iframe>
                 <pre id="log-{{ s.name }}" style="display:none;">Loading...</pre>
             </div>
         </div>
